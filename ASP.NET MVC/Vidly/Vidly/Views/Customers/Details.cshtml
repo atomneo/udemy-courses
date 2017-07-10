@@ -6,12 +6,25 @@
 <h2>Customer details</h2>
 
 <table class="table table-bordered table-hover">
-    <tr>
-        <th>Id:</th>
-        <td>@Model.Id</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Id:</th>
+            <td>@Model.Id</td>
+        </tr>
+    </thead>
     <tr>
         <th>Name:</th>
         <td>@Model.Name</td>
     </tr>
+    <tr>
+        <th>Membership Type:</th>
+        <td>@Model.MembershipType.Name</td>
+    </tr>
+    @if (Model.Birthday != null)
+    {
+        <tr>
+            <th>Birthday:</th>
+            <td>@Model.Birthday</td>
+        </tr>
+    }
 </table>

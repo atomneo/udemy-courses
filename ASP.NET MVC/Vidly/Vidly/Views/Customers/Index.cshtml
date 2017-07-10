@@ -1,27 +1,41 @@
-﻿@model List<Vidly.Models.Customer>
+﻿@model IEnumerable<Vidly.Models.Customer>
 @{
     ViewBag.Title = "Index";
 }
 
 <h2>Customers list</h2>
 
-@if (Model == null || Model.Count == 0)
-{
-    <p>There is no customers.</p>
-}
-else
-{
-    <table class="table table-bordered table-hover">
+<table class="table table-bordered table-hover">
+    <thead>
         <tr>
             <th>Customer name</th>
+            <th>Membership type</th>
+            <th>Price</th>
+            <th>Discount rate</th>
         </tr>
-        @foreach (var customer in Model)
-        {
-            <tr>
-                <td>
-                    @Html.ActionLink(customer.Name, "Details", "Customers", new { id = customer.Id }, null)
-                </td>
-            </tr>
-        }
-    </table>
-}
+    </thead>
+    @foreach (var customer in Model)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink(customer.Name, "Details", "Customers", new { id = customer.Id }, null)
+            </td>
+            <td>
+                @customer.MembershipType.Name
+            </td>
+            <td>
+            @if (customer.MembershipType.SignUpFee == 0)
+            {
+                <span class="bold">Free</span>
+            }
+            else
+            {
+                <span>€ @customer.MembershipType.SignUpFee</span>
+            }
+            </td>
+            <td>
+                @customer.MembershipType.DiscountRate %
+            </td>
+        </tr>
+    }
+</table>
