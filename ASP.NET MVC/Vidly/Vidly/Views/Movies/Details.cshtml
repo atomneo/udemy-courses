@@ -5,3 +5,11 @@
 }
 
 <h2><span style="font-style: italic">@Model.Name</span> details</h2>
+
+<ul>
+    <li>Title: @Model.Name</li>
+    <li >Genre: @Model.Genre.Name</li>
+    <li >Release Date: @($"{Model.ReleaseDate:dd.MM.yyyy}")</li>
+    <li >Date Added: @($"{Model.DateAdded:dd.MM.yyyy}")</li>
+    <li >Stock: @Model.NumberInStock</li>
+</ul>
