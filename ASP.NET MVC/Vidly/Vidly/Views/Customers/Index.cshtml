@@ -7,31 +7,31 @@
 
 <table class="table table-bordered table-hover">
     <thead>
-        <tr>
-            <th>Customer name</th>
-            <th>Membership type</th>
-            <th>Price</th>
-            <th>Discount rate</th>
-        </tr>
+    <tr>
+        <th>Customer name</th>
+        <th>Membership type</th>
+        <th>Price</th>
+        <th>Discount rate</th>
+    </tr>
     </thead>
     @foreach (var customer in Model)
     {
         <tr>
             <td>
-                @Html.ActionLink(customer.Name, "Details", "Customers", new { id = customer.Id }, null)
+                @Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, null)
             </td>
             <td>
                 @customer.MembershipType.Name
             </td>
             <td>
-            @if (customer.MembershipType.SignUpFee == 0)
-            {
-                <span class="bold">Free</span>
-            }
-            else
-            {
-                <span>€ @customer.MembershipType.SignUpFee</span>
-            }
+                @if (customer.MembershipType.SignUpFee == 0)
+                {
+                    <span class="bold">Free</span>
+                }
+                else
+                {
+                    <span>€ @customer.MembershipType.SignUpFee</span>
+                }
             </td>
             <td>
                 @customer.MembershipType.DiscountRate %
@@ -39,3 +39,5 @@
         </tr>
     }
 </table>
+
+@Html.ActionLink("Add new customer", "New", "Customers", null, new { @class = "btn btn-primary" })
