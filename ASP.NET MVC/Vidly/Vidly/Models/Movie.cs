@@ -15,14 +15,19 @@ namespace Vidly.Models
         [StringLength(255)]
         public string Name { get; set; }
 
-        [Required]
         public Genre Genre { get; set; }
+
+        [Required]
+        [Display(Name = "Genre")]
         public short GenreId { get; set; }
 
+        [Display(Name = "Release Date")]
         public DateTime ReleaseDate { get; set; }
 
+        [Display(Name = "Date added")]
         public DateTime DateAdded { get; set; }
 
+        [Display(Name = "Number in stock")]
         public short NumberInStock { get; set; }
     }
 }

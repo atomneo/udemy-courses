@@ -16,7 +16,7 @@
     {
         <tr>
             <td>
-                @movie.Name
+                @Html.ActionLink(movie.Name, "Edit", "Movies", new { id = movie.Id }, null)
             </td>
             <td>
                 @($"{movie.ReleaseDate:yyyy}")
@@ -30,3 +30,5 @@
         </tr>
     }
 </table>
+
+@Html.ActionLink("Add new movie", "New", "Movies", null, new { @class = "btn btn-primary" })
