@@ -28,6 +28,7 @@ namespace Vidly.Models
         public DateTime DateAdded { get; set; }
 
         [Display(Name = "Number in stock")]
+        [Range(1, 20)]
         public short NumberInStock { get; set; }
     }
 }

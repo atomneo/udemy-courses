@@ -4,32 +4,29 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@if (Model.Customer.Id == 0)
-{
-    <h2>New customer</h2>
-}
-else
-{
-    <h2>Edit customer</h2>
-}
+<h2>@Model.Title</h2>
+
+@Html.ValidationSummary()
 
 @using (Html.BeginForm("Save", "Customers"))
 {
     <div class="form-group">
         @Html.LabelFor(c => c.Customer.Name)
         @Html.TextBoxFor(c => c.Customer.Name, new { @class = "form-control"})
-    </div>    
-    
-    <div class="form-group">
-        @Html.LabelFor(c => c.Customer.Birthday)
-        @Html.TextBoxFor(c => c.Customer.Birthday, "{0:dd.MM.yyyy}", new { @class = "form-control"})
+        @Html.ValidationMessageFor(c => c.Customer.Name)
     </div>
-
+    
     <div class="form-group">
         @Html.LabelFor(c => c.Customer.MembershipTypeId)
         @Html.DropDownListFor(c => c.Customer.MembershipTypeId, new SelectList(Model.MembershipTypes, "Id", "Name"), "Select Membership Type", new { @class = "form-control" })
     </div>
 
+    <div class="form-group">
+        @Html.LabelFor(c => c.Customer.Birthday)
+        @Html.TextBoxFor(c => c.Customer.Birthday, "{0:dd.MM.yyyy}", new { @class = "form-control"})
+        @Html.ValidationMessageFor(c => c.Customer.Birthday)
+    </div>
+    
     <div class="checkbox">
         <label>
             @Html.CheckBoxFor(c => c.Customer.IsSubscribedToNewsletter) Is subscribed to newsletter?
@@ -37,6 +34,11 @@ else
     </div>
 
     @Html.HiddenFor(c => c.Customer.Id)
-
+    @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-primary">Save customer</button>
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
 }
