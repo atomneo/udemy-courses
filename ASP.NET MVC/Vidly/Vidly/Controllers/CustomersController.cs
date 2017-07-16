@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 using Vidly.Models;
 using Vidly.ViewModels;
 
@@ -12,6 +16,8 @@ namespace Vidly.Controllers
     public class CustomersController : Controller
     {
         private ApplicationDbContext _context;
+
+        private Random random = new Random();
 
         public CustomersController()
         {
@@ -95,6 +101,34 @@ namespace Vidly.Controllers
             };
 
             return View("CustomerForm", viewModel);
+        }
+
+        public ActionResult NewRandom()
+        {
+            var request = (HttpWebRequest)WebRequest.Create("https://api.namefake.com/");
+            request.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
+            var response = (HttpWebResponse)request.GetResponse();
+
+            var content = response.GetResponseStream();
+            var encoding = Encoding.ASCII;
+
+            using (var reader = new System.IO.StreamReader(content, encoding))
+            {
+                var json = reader.ReadToEnd();
+                var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+
+                var customer = new Customer
+                {
+                    Name = data["name"],
+                    Birthday = DateTime.Parse(data["birth_data"]),
+                    IsSubscribedToNewsletter = random.Next(0, 1) == 0,
+                    MembershipTypeId = (byte)random.Next(1, 4),
+                };
+                _context.Customers.Add(customer);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Customers");
         }
     }
 }

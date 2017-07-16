@@ -5,14 +5,15 @@
 
 <h2>Customers list</h2>
 
-<table class="table table-bordered table-hover">
+<table id="customers" class="table table-bordered table-hover">
     <thead>
-    <tr>
-        <th>Customer name</th>
-        <th>Membership type</th>
-        <th>Price</th>
-        <th>Discount rate</th>
-    </tr>
+        <tr>
+            <th>Customer name</th>
+            <th>Membership type</th>
+            <th>Price</th>
+            <th>Discount rate</th>
+            <th>Delete</th>
+        </tr>
     </thead>
     @foreach (var customer in Model)
     {
@@ -36,8 +37,33 @@
             <td>
                 @customer.MembershipType.DiscountRate %
             </td>
+            <td>
+                <button data-customer-id="@customer.Id" class="btn-link js-delete">Delete</button>
+            </td>
         </tr>
     }
 </table>
 
 @Html.ActionLink("Add new customer", "New", "Customers", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Add random customer", "NewRandom", "Customers", null, new { @class = "btn btn-primary" })
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#customers .js-delete").on("click",
+                function () {
+                    var button = $(this);
+                    if (confirm("Are you sure to delete this customer?")) {
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                button.parents("tr").remove();
+                                console.log("success");
+                            }
+                        });
+                    }
+                });
+        });
+    </script>
+}
