@@ -30,5 +30,10 @@ namespace Vidly.Models
         [Display(Name = "Number in stock")]
         [Range(1, 20)]
         public short NumberInStock { get; set; }
+
+        public Movie()
+        {
+            DateAdded = DateTime.Now;
+        }
     }
 }

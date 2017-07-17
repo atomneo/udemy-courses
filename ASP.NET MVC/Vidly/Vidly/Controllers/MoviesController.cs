@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 using Vidly.Models;
 using Vidly.ViewModels;
 
@@ -12,6 +16,8 @@ namespace Vidly.Controllers
     public class MoviesController : Controller
     {
         private ApplicationDbContext _context;
+
+        private Random random = new Random();
 
         public MoviesController()
         {
@@ -24,20 +30,22 @@ namespace Vidly.Controllers
         }
 
         // GET: /movies
-        public ViewResult Index(int? pageIndex, string sortBy)
+        //public ViewResult Index(int? pageIndex, string sortBy)
+        public ViewResult Index()
         {
-            if (!pageIndex.HasValue)
-            {
-                pageIndex = 1;
-            }
+            //if (!pageIndex.HasValue)
+            //{
+            //    pageIndex = 1;
+            //}
 
-            if (String.IsNullOrEmpty(sortBy))
-            {
-                sortBy = "Name";
-            }
+            //if (String.IsNullOrEmpty(sortBy))
+            //{
+            //    sortBy = "Name";
+            //}
 
-            var movies = _context.Movies.Include(m => m.Genre).ToList();
-            return View(movies);
+            //var movies = _context.Movies.Include(m => m.Genre).ToList();
+            //return View(movies);
+            return View();
         }
 
         public ActionResult Details(int id)
@@ -129,6 +137,44 @@ namespace Vidly.Controllers
         public ActionResult ByReleaseDate(int year, int month)
         {
             return Content($"{year}-{month}");
+        }
+
+        public ActionResult NewRandom()
+        {
+            var request = (HttpWebRequest)WebRequest.Create("https://api.namefake.com/");
+            request.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
+            request.Timeout = 5000;
+            try
+            {
+                var response = (HttpWebResponse)request.GetResponse();
+
+                var content = response.GetResponseStream();
+                var encoding = Encoding.ASCII;
+
+                using (var reader = new StreamReader(content, encoding))
+                {
+                    var json = reader.ReadToEnd();
+                    var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+
+                    var movie = new Movie
+                    {
+                        Name = data["company"],
+                        ReleaseDate = DateTime.ParseExact(data["birth_data"], "yyyy-MM-dd", null),
+                        GenreId = (short)random.Next(1, 9),
+                        NumberInStock = (short)random.Next(1, 15),
+                    };
+                    _context.Movies.Add(movie);
+                    _context.SaveChanges();
+                }
+            }
+            catch (TimeoutException e)
+            {
+
+                Console.WriteLine(e);
+                //todo: show message
+            }
+
+            return RedirectToAction("Index", "Movies");
         }
     }
 }

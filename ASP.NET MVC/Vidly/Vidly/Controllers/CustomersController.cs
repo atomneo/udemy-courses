@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -124,7 +125,7 @@ namespace Vidly.Controllers
                     var customer = new Customer
                     {
                         Name = data["name"],
-                        Birthday = DateTime.Parse(data["birth_data"]),
+                        Birthday = DateTime.ParseExact(data["birth_data"], "yyyy-MM-dd", null),
                         IsSubscribedToNewsletter = random.Next(0, 2) == 0,
                         MembershipTypeId = (byte)random.Next(1, 5),
                     };

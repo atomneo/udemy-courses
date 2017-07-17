@@ -5,14 +5,18 @@
 
 <h2>Movies list</h2>
 
-<table class="table table-bordered table-hover">
+<table id="movies" class="table table-bordered table-hover">
+    <thead>
     <tr>
         <th>Movie name</th>
         <th>Year</th>
         <th>Genre</th>
         <th>Actions</th>
     </tr>
-    @foreach (var movie in Model)
+    </thead>
+    <tbody>
+    </tbody>
+    @*@foreach (var movie in Model)
     {
         <tr>
             <td>
@@ -28,7 +32,57 @@
                 @Html.ActionLink("Show details", "Details", "Movies", new { id = movie.Id }, null)
             </td>
         </tr>
-    }
+    }*@
 </table>
 
 @Html.ActionLink("Add new movie", "New", "Movies", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Add random movie", "NewRandom", "Movies", null, new { @class = "btn btn-primary" })
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var table = $("#movies").DataTable({
+                ajax: {
+                    url: "api/movies",
+                    dataSrc: "",
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function(data, type, movie) {
+                            return "<a href='/movies/edit/" + movie.id + "'>" + movie.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "releaseDate"
+                    },
+                    {
+                        data: "genre.name"
+                    },
+                    {
+                        data: "id", //delete button
+                        render: function(data) {
+                            return "<button class='btn-link js-delete' data-movie-id=" + data + ">Delete</button>";
+                        }
+                    },
+                ],
+            });
+
+            $("#movies").on("click", ".js-delete", function () {
+                var button = $(this);
+
+                bootbox.confirm("Are you sure to delete this movie?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/movies/" + button.attr("data-movie-id"),
+                            method: "DELETE",
+                            success: function () {
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
