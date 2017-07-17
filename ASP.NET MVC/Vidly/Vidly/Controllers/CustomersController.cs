@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -31,8 +32,8 @@ namespace Vidly.Controllers
 
         public ViewResult Index()
         {
-            var customers = _context.Customers.Include(c => c.MembershipType).ToList();
-            return View(customers);
+            //var customers = _context.Customers.Include(c => c.MembershipType).ToList();
+            return View();
         }
 
         public ActionResult Details(int id)
@@ -107,25 +108,35 @@ namespace Vidly.Controllers
         {
             var request = (HttpWebRequest)WebRequest.Create("https://api.namefake.com/");
             request.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
-            var response = (HttpWebResponse)request.GetResponse();
-
-            var content = response.GetResponseStream();
-            var encoding = Encoding.ASCII;
-
-            using (var reader = new System.IO.StreamReader(content, encoding))
+            request.Timeout = 5000;
+            try
             {
-                var json = reader.ReadToEnd();
-                var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                var response = (HttpWebResponse)request.GetResponse();
 
-                var customer = new Customer
+                var content = response.GetResponseStream();
+                var encoding = Encoding.ASCII;
+
+                using (var reader = new StreamReader(content, encoding))
                 {
-                    Name = data["name"],
-                    Birthday = DateTime.Parse(data["birth_data"]),
-                    IsSubscribedToNewsletter = random.Next(0, 1) == 0,
-                    MembershipTypeId = (byte)random.Next(1, 4),
-                };
-                _context.Customers.Add(customer);
-                _context.SaveChanges();
+                    var json = reader.ReadToEnd();
+                    var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+
+                    var customer = new Customer
+                    {
+                        Name = data["name"],
+                        Birthday = DateTime.Parse(data["birth_data"]),
+                        IsSubscribedToNewsletter = random.Next(0, 2) == 0,
+                        MembershipTypeId = (byte)random.Next(1, 5),
+                    };
+                    _context.Customers.Add(customer);
+                    _context.SaveChanges();
+                }
+            }
+            catch (TimeoutException e)
+            {
+
+                Console.WriteLine(e);
+                //todo: show message
             }
 
             return RedirectToAction("Index", "Customers");
