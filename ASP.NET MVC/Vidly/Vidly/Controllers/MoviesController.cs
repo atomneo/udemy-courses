@@ -45,7 +45,10 @@ namespace Vidly.Controllers
 
             //var movies = _context.Movies.Include(m => m.Genre).ToList();
             //return View(movies);
-            return View();
+            if (User.IsInRole("CanManageMovies"))
+                return View("List");
+
+            return View("ReadOnlyList");
         }
 
         public ActionResult Details(int id)
@@ -60,6 +63,7 @@ namespace Vidly.Controllers
             return View(movie);
         }
 
+        [Authorize(Roles = RoleName.CAN_MANAGE_MOVIES)]
         public ActionResult New()
         {
             var genres = _context.Genres.ToList();
@@ -73,6 +77,7 @@ namespace Vidly.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleName.CAN_MANAGE_MOVIES)]
         public ActionResult Save(Movie movie)
         {
             if (movie.Id == 0)
@@ -117,11 +122,12 @@ namespace Vidly.Controllers
         }
 
         // GET: /Movies/Edit/id
+        [Authorize(Roles = RoleName.CAN_MANAGE_MOVIES)]
         public ActionResult Edit(int id)
         {
             var movie = _context.Movies.SingleOrDefault(m => m.Id == id);
 
-            if (movie == null) 
+            if (movie == null)
                 return HttpNotFound();
 
             var viewModel = new MovieFormViewModel
@@ -139,6 +145,7 @@ namespace Vidly.Controllers
             return Content($"{year}-{month}");
         }
 
+        [Authorize(Roles = RoleName.CAN_MANAGE_MOVIES)]
         public ActionResult NewRandom()
         {
             var request = (HttpWebRequest)WebRequest.Create("https://api.namefake.com/");
