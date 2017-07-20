@@ -55,13 +55,13 @@ namespace Vidly
             //   consumerSecret: "");
 
             app.UseFacebookAuthentication(
-               appId: "xxx",
-               appSecret: "xxx");
+               appId: "979166145558710",
+               appSecret: "0fd094865c9acbd27d9371dcc98cb1e1");
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "xxx",
-                ClientSecret = "xxx"
+                ClientId = "956686885398-k7glu3j072lu10ioucuj8e35ccoqnjkv.apps.googleusercontent.com",
+                ClientSecret = "-Y23It6Dlj9fvfwZC7IGXaFe"
             });
         }
     }

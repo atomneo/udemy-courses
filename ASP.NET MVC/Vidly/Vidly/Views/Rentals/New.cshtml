@@ -10,14 +10,14 @@
     <div class="form-group">
         <label>Customer</label>
         <div class="tt-container">
-            <input id="customer" type="text" value="" class="form-control" />
+            <input id="customer" name="customer" required data-rule-validCustomer="true" type="text" value="" class="form-control" />
         </div>
     </div>
 
     <div class="form-group">
         <label>Movies</label>
         <div class="tt-container">
-            <input id="movie" type="text" value="" class="form-control" />
+            <input id="movie" name="movie" data-rule-validMovies="true" type="text" value="" class="form-control" />
         </div>
     </div>
 
@@ -32,76 +32,92 @@
 
 @section scripts
 {
-    <script>
-        $(document).ready(function () {
+    @Scripts.Render("~/bundles/jqueryval")
+        <script>
+            $(document).ready(function () {
 
-            var vm = {
-                moviesIds: []
-            };
+                var vm = {
+                    moviesIds: []
+                };
 
-            var customers = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                remote: {
-                    url: '/api/customers?query=%QUERY',
-                    wildcard: '%QUERY'
-                }
-            });
-
-            $('#customer').typeahead({
-                minLength: 3,
-                highlight: true
-            },
-                {
-                    name: 'customers',
-                    display: 'name',
-                    source: customers
-                }).on("typeahead:select",
-                function (e, customer) {
-                    vm.customerId = customer.id;
+                var customers = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: {
+                        url: '/api/customers?query=%QUERY',
+                        wildcard: '%QUERY'
+                    }
                 });
 
-            var movies = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                remote: {
-                    url: '/api/movies?query=%QUERY',
-                    wildcard: '%QUERY'
-                }
-            });
-
-            $('#movie').typeahead({
-                minLength: 3,
-                highlight: true
-            },
-                {
-                    name: 'movies',
-                    display: 'name',
-                    source: movies
-                }).on("typeahead:select",
-                function (e, movie) {
-                    $("#movies").append("<li class='list-group-item'>" + movie.name + "</li>");
-
-                    $("#movie").typeahead("val", "");
-
-                    vm.moviesIds.push(movie.id);
-                });
-
-            $("#newRental").submit(function (e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: "/api/rentals",
-                    method: "post",
-                    data: vm
-                })
-                    .done(function () {
-                        toastr.success("Rentals successfully recorded.");
-                    })
-                    .fail(function () {
-                        toastr.error("Something unexpected happened.");
+                $('#customer').typeahead({
+                    minLength: 3,
+                    highlight: true
+                },
+                    {
+                        name: 'customers',
+                        display: 'name',
+                        source: customers
+                    }).on("typeahead:select",
+                    function (e, customer) {
+                        vm.customerId = customer.id;
                     });
+
+                var movies = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: {
+                        url: '/api/movies?query=%QUERY',
+                        wildcard: '%QUERY'
+                    }
+                });
+
+                $('#movie').typeahead({
+                    minLength: 3,
+                    highlight: true
+                },
+                    {
+                        name: 'movies',
+                        display: 'name',
+                        source: movies
+                    }).on("typeahead:select",
+                    function (e, movie) {
+                        $("#movies").append("<li class='list-group-item'>" + movie.name + "</li>");
+
+                        $("#movie").typeahead("val", "");
+
+                        vm.moviesIds.push(movie.id);
+                    });
+
+                $.validator.addMethod("validCustomer", function() {
+                    return vm.customerId && vm.customerId !== 0;
+                }, "Please select a valid customer.");
+
+                $.validator.addMethod("validMovies", function() {
+                    return vm.moviesIds.length > 0;
+                }, "Please select at least one movie.");
+
+                var validator = $("#newRental").validate({
+                    submitHandler: function () {
+                        $.ajax({
+                            url: "/api/rentals",
+                            method: "post",
+                            data: vm
+                        })
+                            .done(function () {
+                                toastr.success("Rentals successfully recorded.");
+                                $('#customer').typeahead("val", "");
+                                $('#movie').typeahead("val", "");
+                                $('#movies').empty();
+                                vm = { moviesIds: [] };
+                                validator.resetForm();
+                            })
+                            .fail(function () {
+                                toastr.error("Something unexpected happened.");
+                            });
+
+                        return false;
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 }
