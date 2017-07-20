@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Caching;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -33,7 +34,15 @@ namespace Vidly.Controllers
 
         public ViewResult Index()
         {
-            //var customers = _context.Customers.Include(c => c.MembershipType).ToList();
+            //I don't know why Mosh suggested to cache genres in Customers controller, but whatever ;-)
+
+            //if (MemoryCache.Default[CacheKeys.GENRES] == null)
+            //{
+            //    MemoryCache.Default[CacheKeys.GENRES] = _context.Genres.ToList();
+            //}
+
+            //var genres = MemoryCache.Default[CacheKeys.GENRES] as IEnumerable<Genre>;
+
             return View();
         }
 
