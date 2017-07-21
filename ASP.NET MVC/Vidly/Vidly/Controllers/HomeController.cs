@@ -27,5 +27,12 @@ namespace Vidly.Controllers
 
             return View();
         }
+
+        public ActionResult Error()
+        {
+            throw new ArithmeticException($"Nowy błąd ({DateTime.Now})");
+
+            return null;
+        }
     }
 }
